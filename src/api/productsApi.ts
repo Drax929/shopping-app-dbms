@@ -106,7 +106,7 @@ export const createProduct = async (product: Omit<Product, '_id' | 'createdAt' |
     return {
       ...newProduct,
       _id: result.insertedId.toString(),
-    };
+    } as Product;
   } catch (error) {
     console.error('Error creating product:', error);
     throw error;
