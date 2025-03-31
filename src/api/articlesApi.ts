@@ -1,7 +1,4 @@
 
-import { MongoClient, ObjectId } from 'mongodb';
-import clientPromise from '../lib/mongodb';
-
 // Types
 export interface Article {
   _id?: string;
@@ -19,36 +16,7 @@ export interface ArticleFilter {
   searchTerm?: string;
 }
 
-// Mock data for development when MongoDB isn't connected
-const mockArticles: Article[] = [
-  {
-    _id: '1',
-    title: 'Getting Started with MongoDB',
-    content: 'MongoDB is a NoSQL database that provides high performance, high availability, and easy scalability.',
-    category: 'Database',
-    tags: ['MongoDB', 'NoSQL', 'Database'],
-    createdAt: new Date('2023-01-01'),
-    updatedAt: new Date('2023-01-02'),
-  },
-  {
-    _id: '2',
-    title: 'React Hooks Explained',
-    content: 'React Hooks are functions that let you "hook into" React state and lifecycle features from function components.',
-    category: 'Frontend',
-    tags: ['React', 'JavaScript', 'Hooks'],
-    createdAt: new Date('2023-02-01'),
-    updatedAt: new Date('2023-02-02'),
-  },
-  {
-    _id: '3',
-    title: 'Tailwind CSS Tips and Tricks',
-    content: 'Tailwind CSS is a utility-first CSS framework that can be composed to build any design, directly in your markup.',
-    category: 'CSS',
-    tags: ['CSS', 'Tailwind', 'Frontend'],
-    createdAt: new Date('2023-03-01'),
-    updatedAt: new Date('2023-03-02'),
-  },
-];
+import clientPromise from '../lib/mongodb';
 
 // Get all articles with optional filtering
 export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]> => {
@@ -82,10 +50,8 @@ export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]
       
     return articles as Article[];
   } catch (error) {
-    console.error('Error fetching articles from MongoDB:', error);
-    // Return mock data if MongoDB connection fails
-    console.log('Returning mock data instead');
-    return mockArticles;
+    console.error('Error fetching articles:', error);
+    return [];
   }
 };
 
@@ -97,14 +63,12 @@ export const getArticleById = async (id: string): Promise<Article | null> => {
     
     const article = await db
       .collection('articles')
-      .findOne({ _id: new ObjectId(id) });
+      .findOne({ _id: id });
       
-    return article as Article;
+    return article as Article | null;
   } catch (error) {
-    console.error('Error fetching article from MongoDB:', error);
-    // Return mock article if MongoDB connection fails
-    const mockArticle = mockArticles.find(a => a._id === id);
-    return mockArticle || null;
+    console.error('Error fetching article:', error);
+    return null;
   }
 };
 
@@ -128,14 +92,8 @@ export const createArticle = async (article: Article): Promise<Article> => {
       _id: result.insertedId.toString(),
     };
   } catch (error) {
-    console.error('Error creating article in MongoDB:', error);
-    // Return the article with a mock ID if MongoDB connection fails
-    return {
-      ...article,
-      _id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    console.error('Error creating article:', error);
+    throw error;
   }
 };
 
@@ -151,14 +109,13 @@ export const updateArticle = async (id: string, article: Partial<Article>): Prom
     };
     
     await db.collection('articles').updateOne(
-      { _id: new ObjectId(id) },
+      { _id: id },
       { $set: updatedArticle }
     );
     
     return getArticleById(id);
   } catch (error) {
-    console.error('Error updating article in MongoDB:', error);
-    // Return null if MongoDB connection fails
+    console.error('Error updating article:', error);
     return null;
   }
 };
@@ -169,12 +126,11 @@ export const deleteArticle = async (id: string): Promise<boolean> => {
     const client = await clientPromise;
     const db = client.db();
     
-    const result = await db.collection('articles').deleteOne({ _id: new ObjectId(id) });
+    const result = await db.collection('articles').deleteOne({ _id: id });
     
     return result.deletedCount === 1;
   } catch (error) {
-    console.error('Error deleting article from MongoDB:', error);
-    // Return false if MongoDB connection fails
+    console.error('Error deleting article:', error);
     return false;
   }
 };
@@ -191,8 +147,7 @@ export const getCategories = async (): Promise<string[]> => {
       
     return categories;
   } catch (error) {
-    console.error('Error fetching categories from MongoDB:', error);
-    // Return mock categories if MongoDB connection fails
+    console.error('Error fetching categories:', error);
     return ['Database', 'Frontend', 'CSS', 'JavaScript', 'Backend'];
   }
 };
@@ -209,8 +164,7 @@ export const getTags = async (): Promise<string[]> => {
       
     return tags;
   } catch (error) {
-    console.error('Error fetching tags from MongoDB:', error);
-    // Return mock tags if MongoDB connection fails
+    console.error('Error fetching tags:', error);
     return ['MongoDB', 'NoSQL', 'Database', 'React', 'JavaScript', 'Hooks', 'CSS', 'Tailwind', 'Frontend'];
   }
 };
