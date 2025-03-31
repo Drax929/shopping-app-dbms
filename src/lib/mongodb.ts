@@ -91,9 +91,17 @@ class MockDB {
 
   private filterArticles(query: any): Article[] {
     return this.articles.filter(article => {
-      // Filter by category
-      if (query.category && article.category !== query.category) {
-        return false;
+      // Filter by category (with regex support)
+      if (query.category) {
+        if (query.category.$regex instanceof RegExp) {
+          // Handle regex-based category matching
+          if (!query.category.$regex.test(article.category)) {
+            return false;
+          }
+        } else if (article.category !== query.category) {
+          // Direct string comparison as fallback
+          return false;
+        }
       }
       
       // Filter by tags

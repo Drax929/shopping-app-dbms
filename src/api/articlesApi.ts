@@ -28,7 +28,8 @@ export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]
     const query: any = {};
     
     if (filter.category) {
-      query.category = filter.category;
+      // Make category matching case-insensitive
+      query.category = { $regex: new RegExp(`^${filter.category}$`, 'i') };
     }
     
     if (filter.tags && filter.tags.length > 0) {
