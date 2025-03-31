@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import Header from '../components/Header';
@@ -11,6 +10,7 @@ import {
   Article, 
   ArticleFilter 
 } from '../api/articlesApi';
+import { useLocation } from 'react-router-dom';
 
 const Index = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -20,13 +20,13 @@ const Index = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const location = useLocation();
 
   useEffect(() => {
     const loadInitialData = async () => {
       try {
         setLoading(true);
         
-        // Load categories and tags
         const [categoriesData, tagsData] = await Promise.all([
           getCategories(),
           getTags()
@@ -35,7 +35,6 @@ const Index = () => {
         setCategories(categoriesData);
         setTags(tagsData);
         
-        // Load articles without filters initially
         const articlesData = await getArticles();
         setArticles(articlesData);
       } catch (error) {
@@ -47,7 +46,7 @@ const Index = () => {
     };
     
     loadInitialData();
-  }, []);
+  }, [location.pathname]);
   
   useEffect(() => {
     const loadArticles = async () => {
@@ -78,7 +77,6 @@ const Index = () => {
       }
     };
     
-    // Debounce the search to avoid too many requests
     const timer = setTimeout(loadArticles, 300);
     return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, selectedTags]);
