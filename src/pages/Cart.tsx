@@ -1,16 +1,27 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import ShopHeader from '../components/ShopHeader';
+import CheckoutForm from '../components/CheckoutForm';
 import { useCart } from '../hooks/useCart';
 import { Button } from '@/components/ui/button';
 import { Trash2, Plus, Minus, ArrowLeft, ShoppingBag } from 'lucide-react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, clearCart, totalPrice } = useCart();
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showCheckout, setShowCheckout] = useState(false);
+  const navigate = useNavigate();
+  
+  const handleCheckoutSuccess = (orderId: string) => {
+    clearCart();
+    navigate(`/order-success/${orderId}`);
+  };
+  
+  const totalWithTax = totalPrice + (totalPrice * 0.1);
   
   if (items.length === 0) {
     return (
@@ -159,17 +170,34 @@ const Cart = () => {
                   <Separator />
                   <div className="flex justify-between font-semibold">
                     <span>Total</span>
-                    <span>${(totalPrice + (totalPrice * 0.1)).toFixed(2)}</span>
+                    <span>${totalWithTax.toFixed(2)}</span>
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full">Proceed to Checkout</Button>
+                <Button className="w-full" onClick={() => setShowCheckout(true)}>
+                  Proceed to Checkout
+                </Button>
               </CardFooter>
             </Card>
           </div>
         </div>
       </div>
+
+      {/* Checkout Dialog */}
+      <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Checkout</DialogTitle>
+          </DialogHeader>
+          <CheckoutForm 
+            items={items}
+            totalAmount={totalWithTax}
+            onSuccess={handleCheckoutSuccess}
+            onCancel={() => setShowCheckout(false)}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
