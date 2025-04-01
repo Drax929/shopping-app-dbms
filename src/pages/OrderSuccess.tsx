@@ -4,14 +4,15 @@ import { Link, useParams } from 'react-router-dom';
 import { getOrderById, Order } from '../api/orderApi';
 import ShopHeader from '../components/ShopHeader';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, ShoppingBag, ArrowLeft, Package } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { CheckCircle, ShoppingBag, ArrowLeft, Package, Truck } from 'lucide-react';
+import { format, addDays } from 'date-fns';
 
 const OrderSuccess = () => {
   const { id } = useParams<{ id: string }>();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [estimatedDelivery, setEstimatedDelivery] = useState<Date | null>(null);
 
   useEffect(() => {
     const loadOrder = async () => {
@@ -21,6 +22,10 @@ const OrderSuccess = () => {
         setLoading(true);
         const orderData = await getOrderById(id);
         setOrder(orderData);
+        
+        // Generate random delivery date between 3-7 days from now
+        const daysToAdd = Math.floor(Math.random() * 5) + 3; // 3-7 days
+        setEstimatedDelivery(addDays(new Date(), daysToAdd));
       } catch (error) {
         console.error('Error loading order:', error);
       } finally {
@@ -75,9 +80,18 @@ const OrderSuccess = () => {
               <CheckCircle className="h-10 w-10" />
             </div>
             <h1 className="text-2xl font-bold text-green-600 mb-2">Order Placed Successfully!</h1>
-            <p className="text-gray-600">
-              Thank you for shopping with us. Your order has been received and is being processed.
+            <p className="text-gray-600 mb-2">
+              Thank you for shopping with us. Your order has been confirmed and is now being processed.
             </p>
+            {estimatedDelivery && (
+              <div className="mt-4 bg-blue-50 p-4 rounded-md flex items-center gap-3 text-blue-700">
+                <Truck className="h-5 w-5" />
+                <p>
+                  <span className="font-medium">Estimated Delivery:</span>{' '}
+                  {format(estimatedDelivery, 'EEEE, MMMM d, yyyy')}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="mb-6">
