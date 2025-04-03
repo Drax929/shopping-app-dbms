@@ -64,11 +64,7 @@ export const getOrderById = async (id: string): Promise<Order | null> => {
       
     if (!order) return null;
     
-    return {
-      ...order,
-      createdAt: new Date(order.createdAt),
-      updatedAt: new Date(order.updatedAt)
-    } as Order;
+    return order as Order;
   } catch (error) {
     console.error('Error fetching order:', error);
     return null;
@@ -86,11 +82,7 @@ export const getOrdersByCustomerEmail = async (email: string): Promise<Order[]> 
       .sort({ createdAt: -1 })
       .toArray();
       
-    return orders.map(order => ({
-      ...order,
-      createdAt: new Date(order.createdAt),
-      updatedAt: new Date(order.updatedAt)
-    })) as Order[];
+    return orders as Order[];
   } catch (error) {
     console.error('Error fetching customer orders:', error);
     return [];
