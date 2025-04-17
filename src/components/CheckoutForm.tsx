@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 import {
   Form,
   FormControl,
@@ -43,6 +44,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   onCancel,
 }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
@@ -80,6 +82,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       if (order && order._id) {
         toast.success('Order placed successfully!');
         onSuccess(order._id.toString());
+        navigate(`/order-success/${order._id}`);
       } else {
         throw new Error('Failed to create order');
       }
