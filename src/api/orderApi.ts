@@ -76,10 +76,11 @@ export const getOrdersByCustomerEmail = async (email: string): Promise<Order[]> 
     const client = await mockClientPromise;
     const db = client.db();
     
-    const orders = await db
+    const findResult = await db
       .collection('orders')
-      .find({ 'customerInfo.email': email })
-      .toArray();
+      .find({ 'customerInfo.email': email });
+    
+    const orders = await findResult.toArray();
     
     // Sort by createdAt (newest first)
     return orders.sort((a, b) => 

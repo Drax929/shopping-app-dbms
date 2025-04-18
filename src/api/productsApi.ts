@@ -58,10 +58,11 @@ export const getProducts = async (filter: ProductFilter = {}): Promise<Product[]
       }
     }
     
-    const products = await db
+    const findResult = await db
       .collection('products')
-      .find(query)
-      .toArray();
+      .find(query);
+    
+    const products = await findResult.toArray();
     
     // Sort products by createdAt (newest first)
     return products.sort((a, b) => 

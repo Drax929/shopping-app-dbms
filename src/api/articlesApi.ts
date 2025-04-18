@@ -43,10 +43,8 @@ export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]
       ];
     }
     
-    const articles = await db
-      .collection('articles')
-      .find(query)
-      .toArray();
+    const findResult = await db.collection('articles').find(query);
+    const articles = await findResult.toArray();
       
     // Sort articles by createdAt (newest first)
     return articles.sort((a, b) => 
