@@ -1,5 +1,6 @@
+
 import { Product } from '../api/productsApi';
-// PRODUCTS DATABASE   
+
 export const mockProducts: Product[] = [
   {
     _id: '1',
@@ -527,4 +528,6 @@ export const mockProducts: Product[] = [
     imageUrl: 'https://images.unsplash.com/photo-1558449028-b53a39d100fc?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3',
     inventory: 25,
     createdAt: new Date('2024-04-01'),
-    updatedAt: new Date('2024-04-
+    updatedAt: new Date('2024-04-01'),
+  }
+];
