@@ -1,4 +1,4 @@
-
+// product page database
 import { Product } from '../api/productsApi';
 
 export const mockProducts: Product[] = [
