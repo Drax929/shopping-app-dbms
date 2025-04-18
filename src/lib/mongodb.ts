@@ -1,4 +1,4 @@
-
+// Backend implementation of the project
 // This file provides a mock implementation for browser environments
 // In a real application, you would use a backend API instead of direct MongoDB access
 
