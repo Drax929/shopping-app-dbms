@@ -1,5 +1,4 @@
-
-import mockClientPromise from '../lib/mongodb';
+import mockClientPromise from '../lib/mockDb';
 import { CartItem } from '../hooks/useCart';
 
 export interface CustomerInfo {

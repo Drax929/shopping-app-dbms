@@ -1,4 +1,3 @@
-
 // Types
 export interface Product {
   _id: string;
@@ -21,7 +20,7 @@ export interface ProductFilter {
   maxPrice?: number;
 }
 
-import mockClientPromise from '../lib/mongodb';
+import mockClientPromise from '../lib/mockDb';
 
 // Get all products with optional filtering
 export const getProducts = async (filter: ProductFilter = {}): Promise<Product[]> => {

@@ -1,4 +1,3 @@
-
 // Types
 export interface Article {
   _id?: string;
@@ -16,12 +15,12 @@ export interface ArticleFilter {
   searchTerm?: string;
 }
 
-import clientPromise from '../lib/mongodb';
+import mockClientPromise from '../lib/mockDb';
 
 // Get all articles with optional filtering
 export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     // Build query based on filters
@@ -59,7 +58,7 @@ export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]
 // Get a single article by ID
 export const getArticleById = async (id: string): Promise<Article | null> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const article = await db
@@ -76,7 +75,7 @@ export const getArticleById = async (id: string): Promise<Article | null> => {
 // Create a new article
 export const createArticle = async (article: Article): Promise<Article> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const now = new Date();
@@ -101,7 +100,7 @@ export const createArticle = async (article: Article): Promise<Article> => {
 // Update an existing article
 export const updateArticle = async (id: string, article: Partial<Article>): Promise<Article | null> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const updatedArticle = {
@@ -124,7 +123,7 @@ export const updateArticle = async (id: string, article: Partial<Article>): Prom
 // Delete an article
 export const deleteArticle = async (id: string): Promise<boolean> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const result = await db.collection('articles').deleteOne({ _id: id });
@@ -139,7 +138,7 @@ export const deleteArticle = async (id: string): Promise<boolean> => {
 // Get all categories
 export const getCategories = async (): Promise<string[]> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const categories = await db
@@ -156,7 +155,7 @@ export const getCategories = async (): Promise<string[]> => {
 // Get all tags
 export const getTags = async (): Promise<string[]> => {
   try {
-    const client = await clientPromise;
+    const client = await mockClientPromise;
     const db = client.db();
     
     const tags = await db
