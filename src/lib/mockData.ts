@@ -1,5 +1,5 @@
 import { Product } from '../api/productsApi';
-
+// PRODUCTS DATABASE
 export const mockProducts: Product[] = [
   {
     _id: '1',
