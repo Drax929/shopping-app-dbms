@@ -1,5 +1,5 @@
 
-// FOR CATEGORIES, USER DETAILS
+// FOR CATEGORIES, USER DETAILS 
 import { Product } from '../api/productsApi';
 import { Order } from '../api/orderApi';
 import { Article } from '../api/articlesApi';
