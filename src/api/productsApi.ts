@@ -1,3 +1,4 @@
+
 // Types
 export interface Product {
   _id: string;
@@ -60,10 +61,12 @@ export const getProducts = async (filter: ProductFilter = {}): Promise<Product[]
     const products = await db
       .collection('products')
       .find(query)
-      .sort({ createdAt: -1 })
       .toArray();
-      
-    return products as Product[];
+    
+    // Sort products by createdAt (newest first)
+    return products.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) as Product[];
   } catch (error) {
     console.error('Error fetching products:', error);
     return [];

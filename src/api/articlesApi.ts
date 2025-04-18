@@ -1,3 +1,4 @@
+
 // Types
 export interface Article {
   _id?: string;
@@ -45,10 +46,12 @@ export const getArticles = async (filter: ArticleFilter = {}): Promise<Article[]
     const articles = await db
       .collection('articles')
       .find(query)
-      .sort({ createdAt: -1 })
       .toArray();
       
-    return articles as Article[];
+    // Sort articles by createdAt (newest first)
+    return articles.sort((a, b) => 
+      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    ) as Article[];
   } catch (error) {
     console.error('Error fetching articles:', error);
     return [];

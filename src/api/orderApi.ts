@@ -1,3 +1,4 @@
+
 import mockClientPromise from '../lib/mockDb';
 import { CartItem } from '../hooks/useCart';
 
@@ -78,10 +79,12 @@ export const getOrdersByCustomerEmail = async (email: string): Promise<Order[]> 
     const orders = await db
       .collection('orders')
       .find({ 'customerInfo.email': email })
-      .sort({ createdAt: -1 })
       .toArray();
-      
-    return orders as Order[];
+    
+    // Sort by createdAt (newest first)
+    return orders.sort((a, b) => 
+      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) as Order[];
   } catch (error) {
     console.error('Error fetching customer orders:', error);
     return [];
