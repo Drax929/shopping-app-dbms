@@ -1,3 +1,4 @@
+
 // FOR CATEGORIES, USER DETAILS
 import { Product } from '../api/productsApi';
 import { Order } from '../api/orderApi';
@@ -9,6 +10,7 @@ interface FilterQuery {
   tags?: { $in: string[] };
   $or?: Array<{ [key: string]: { $regex: string; $options?: string } }>;
   price?: { $gte?: number; $lte?: number };
+  'customerInfo.email'?: string;
 }
 
 export class MockCollection<T extends { _id?: string }> {
@@ -19,10 +21,10 @@ export class MockCollection<T extends { _id?: string }> {
   }
 
   async find(query: FilterQuery = {}) {
+    let filteredData = this.filterData(query);
+    
     return {
-      sort: () => ({
-        toArray: async () => this.filterData(query)
-      })
+      toArray: async () => filteredData
     };
   }
 
@@ -71,40 +73,53 @@ export class MockCollection<T extends { _id?: string }> {
 
   private filterData(query: FilterQuery): T[] {
     return this.data.filter(item => {
-      const product = item as unknown as Product;
-      
-      if (query.category) {
-        if (!query.category.$regex.test(product.category)) {
-          return false;
-        }
-      }
-      
-      if (query.tags && query.tags.$in) {
-        const hasTag = query.tags.$in.some(tag => 
-          product.tags.includes(tag)
-        );
-        if (!hasTag) return false;
-      }
-      
-      if (query.$or) {
-        const searchTerms = query.$or.map(condition => {
-          const key = Object.keys(condition)[0];
-          return condition[key].$regex;
-        }).filter(Boolean);
+      // Handle product specific filtering
+      if ('price' in item || 'category' in item) {
+        const product = item as unknown as Product;
         
-        if (searchTerms.length > 0) {
-          const searchPattern = new RegExp(searchTerms.join('|'), 'i');
-          const matches = searchPattern.test(product.name) || 
-                         searchPattern.test(product.description);
-          if (!matches) return false;
+        if (query.category && product.category) {
+          if (!query.category.$regex.test(product.category)) {
+            return false;
+          }
+        }
+        
+        if (query.tags && query.tags.$in && 'tags' in item) {
+          const productTags = (item as any).tags || [];
+          const hasTag = query.tags.$in.some(tag => 
+            productTags.includes(tag)
+          );
+          if (!hasTag) return false;
+        }
+        
+        if (query.$or) {
+          const searchTerms = query.$or.map(condition => {
+            const key = Object.keys(condition)[0];
+            return condition[key].$regex;
+          }).filter(Boolean);
+          
+          if (searchTerms.length > 0) {
+            const searchPattern = new RegExp(searchTerms.join('|'), 'i');
+            const matches = searchPattern.test((item as any).name) || 
+                          searchPattern.test((item as any).description);
+            if (!matches) return false;
+          }
+        }
+        
+        if ('price' in query && query.price && 'price' in item) {
+          const itemPrice = (item as any).price as number;
+          if (query.price.$gte !== undefined && itemPrice < query.price.$gte) {
+            return false;
+          }
+          if (query.price.$lte !== undefined && itemPrice > query.price.$lte) {
+            return false;
+          }
         }
       }
       
-      if ('price' in query && query.price) {
-        if (query.price.$gte !== undefined && product.price < query.price.$gte) {
-          return false;
-        }
-        if (query.price.$lte !== undefined && product.price > query.price.$lte) {
+      // Handle order filtering by customer email
+      if (query['customerInfo.email'] && 'customerInfo' in item) {
+        const order = item as unknown as Order;
+        if (order.customerInfo.email !== query['customerInfo.email']) {
           return false;
         }
       }
